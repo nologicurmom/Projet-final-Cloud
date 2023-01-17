@@ -1,18 +1,32 @@
 package com.example.datasyncv1.models;
 
+import java.sql.Date;
+
 public class TokenUser {
-    public int idtokenuser;
+    public String idtokenuser;
     public int idUtilisateur;
     public String token;
-    public String datecreation;
-    public String dateexpiration;
+    public Date datecreation;
+    public Date dateexpiration;
     public String role;
 
-    public int getIdtokenuser() {
+    public TokenUser() {
+    }
+
+    public TokenUser(String idtokenuser, int idUtilisateur, String token, Date datecreation, Date dateexpiration, String role) {
+        this.idtokenuser = idtokenuser;
+        this.idUtilisateur = idUtilisateur;
+        this.token = token;
+        this.datecreation = datecreation;
+        this.dateexpiration = dateexpiration;
+        this.role = role;
+    }
+
+    public String getIdtokenuser() {
         return idtokenuser;
     }
 
-    public void setIdtokenuser(int idtokenuser) {
+    public void setIdtokenuser(String idtokenuser) {
         this.idtokenuser = idtokenuser;
     }
 
@@ -32,19 +46,19 @@ public class TokenUser {
         this.token = token;
     }
 
-    public String getDatecreation() {
+    public Date getDatecreation() {
         return datecreation;
     }
 
-    public void setDatecreation(String datecreation) {
+    public void setDatecreation(Date datecreation) {
         this.datecreation = datecreation;
     }
 
-    public String getDateexpiration() {
+    public Date getDateexpiration() {
         return dateexpiration;
     }
 
-    public void setDateexpiration(String dateexpiration) {
+    public void setDateexpiration(Date dateexpiration) {
         this.dateexpiration = dateexpiration;
     }
 

@@ -6,40 +6,78 @@ import com.example.datasyncv1.models.Utilisateur;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class UtilisateurDao {
     Utilisateur user = new Utilisateur();
-    public String login(String user,String mdp) throws Exception {
-        String idUser = "";
+    public Utilisateur login(String user,String mdp) throws Exception {
+        Utilisateur u = null;
         try {
-            String requete = "select idUtilisateur from Utilisateur where email='" + user + "' and mdp='" + mdp + "' ";
+            String requete = "select * from Utilisateur where email='" + user + "' and mdp='" + mdp + "' ";
             Connexion c = new Connexion(requete, "");
             ResultSet res = c.getResultset();
             c.getResultset().next();
-            idUser = res.getString(1);
+            String idUser = res.getString(1);
+            String nom = res.getString(2);
+            String prenom = res.getString(3);
+            String email = res.getString(4);
+            String m = res.getString(5);
+            u = new Utilisateur(nom,prenom,email,m);
         } catch (Exception e) {
-            idUser = "null";
+
         }
-        return idUser;
+        return u;
     }
 
-    public void Inscription(Connection con,String nom,String prenom,String email,String mdp) throws Exception {
-        Utilisateur u = new Utilisateur(nom,prenom,email,mdp);
-        u.insert(con);
+    public void Inscription(Connexion con,String nom,String prenom,String email,String mdp) throws Exception {
+
+        String requete="insert into utilisateur(nom,prenom,email,mdp) values ('"+nom+"','"+prenom+"','"+email+"','"+mdp+"')";
+        con = new Connexion(requete);
+        con.getResultset();
     }
 
     public float getCompteUser(int idclient,Connexion con) throws Exception {
-        String requete = "select compte from utilisateur  where idutilisateur='"+idclient+"' ";
-        con = new Connexion(requete);
+        String requete = "select compte from utilisateur  where idutilisateur="+idclient+" ";
+        con = new Connexion(requete,"");
         con.getResultset().next();
         float result = con.getResultset().getFloat(1);
         return result;
     }
 
-    public float setCompteUser(int idclient,float montant,Connexion con) throws Exception
+    public void setCompteUser(int idclient,float montant,Connexion con) throws Exception
     {
         float soldeUser = this.getCompteUser(idclient,con)+montant;
-        return soldeUser;
+        try {
+            String requete = "update utilisateur set compte="+soldeUser+" where idutilisateur="+idclient+"";
+            con = new Connexion(requete);
+            con.getCommit();
+        } catch (Exception exc) {
+
+            try {
+                con.getRollBack();
+                System.out.println("Transaction échouée : annulation");
+            } catch (SQLException ex) {
+
+            }
+        }
+        finally {}
     }
+
+    public void rechargerCompte(int idclient,float montant,Connexion con) throws Exception
+    {
+        try {
+            String requete = "insert into rechargementcompte(idutilisateur,montant) values("+idclient+","+montant+")";
+            con = new Connexion(requete);
+            con.getCommit();
+        } catch (Exception exc) {
+            try {
+                con.getRollBack();
+                System.out.println("Transaction échouée : annulation");
+            } catch (SQLException ex) {}
+        }
+        finally {}
+    }
+
+
 
 }

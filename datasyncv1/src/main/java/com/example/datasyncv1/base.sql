@@ -12,14 +12,6 @@ DateInscription date default CURRENT_DATE,
 compte float default 0
 );
 
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Hardi', 'Tojoniaina', 'hardi@gmail.com', 'hardi','2021-10-12');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Bryan', 'Ramarokoto', 'bryan@gmail.com', 'bryan','2020-05-09');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Anjary', 'Raharison', 'anjary@gmail.com', 'anjary','2022-08-11');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('NyAndo', 'Ras', 'Nyando@gmail.com', 'nyando','2022-04-03');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Brown', 'Bob', 'bobbrown@gmail.com', 'password789','2019-05-06');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Johnson', 'Samantha', 'samantha@gmail.com', 'password111','2022-06-16');
-INSERT INTO Utilisateur (nom, prenom, email, mdp,DateInscription) VALUES ('Williams', 'Michael', 'michael@gmail.com', 'password222','2019-03-22');
-
 
 create table Admin(
 idAdmin serial primary key,    
@@ -27,10 +19,8 @@ email varchar(20),
 mdp varchar(20)
 );
 
-INSERT INTO Admin (email, mdp) VALUES ('admin@gmail.com', 'admin');
-
-
 create table RechargementCompte(
+idRechargementCompte serial primary key,    
 idUtilisateur int references Utilisateur(idUtilisateur),
 montant float,
 DateHeureRechargement TIMESTAMP default CURRENT_TIMESTAMP ,
@@ -41,14 +31,6 @@ create table CategorieProduit(
 idCategorieProduit serial primary key,
 typeCategorie varchar(20)
 );
-
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Electronique');
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Oeuvres darts');
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Bijoux');
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Livres');
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Objets de Collection');
-INSERT INTO CategorieProduit (typeCategorie) VALUES ('Vêtements');
-
 
 create table Produit(
 idProduit serial primary key,
@@ -64,46 +46,28 @@ idCategorieProduit int REFERENCES CategorieProduit(idCategorieProduit)
 );
 
 
-INSERT INTO Produit (nomProduit,description,prix,numero_serie,DateSortie,Etat,Provenance,idCategorieProduit) VALUES ('IPHONE 14','le tout nouveau produit de Apple. Elle très puissante',2000,'IPH-OLED-001','2020-10-09',9,'France',1);
-INSERT INTO Produit (nomProduit,description,prix,numero_serie,DateSortie,Etat,Provenance,idCategorieProduit) VALUES ('Asus ROG Strix','Un ordinateur avec un processeur rapide',600,'LAP-I7-16G-020','2019-11-07',10,'Canada',1);
-INSERT INTO Produit (nomProduit,description,prix,numero_serie,DateSortie,Etat,Provenance,idCategorieProduit) VALUES ('Batterie Panneau Solaire','Une batterie haut de gamme avec une capacité de rechargement rapide',500,'BT-004-6G','2022-05-04',10,'Belgique',1);
-
-
------view-----
-
-create or replace view ProduitCategorie as
-select p.idProduit , p.nomProduit , p.description , p.prix , p.numero_serie , p.DateSortie , p.Etat , p.Provenance , p.photo , c.idCategorieProduit , c.typeCategorie  from Produit p inner join CategorieProduit c using(idCategorieProduit)
-
-
-------
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Tableau', 'Un magnifique tableau de style impressionniste', 500.0, 'A001','2021-04-10',10,'Madagascar',2);
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Sculpture', 'Une sculpture en marbre de style classique', 2000.0, 'S001','2022-02-22',10,'Madagascar',2);
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Peinture', 'Une peinture à l''huile de style abstrait', 800.0, 'P001','2022-08-07',10,'Madagascar',2);
-
---------
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Collier', 'Un collier en argent avec pierre précieuse', 100.0, 'C001','2022-11-08',8,'Dubai',3);
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Bague', 'Une bague en or avec diamant', 500.0, 'B001','2022-07-09',9,'Chine',3);
-INSERT INTO Produit (nomProduit, description, prix, numero_serie,DateSortie,Etat,Provenance,idCategorieProduit)
-VALUES ('Bracelet', 'Un bracelet en perles', 150.0, 'BR001','2022-03-23',10,'France',3);
-
 
 create table Enchere(
 idEnchere serial primary key,
 idUtilisateur int references Utilisateur(idUtilisateur),
-idProduit int references Produit(idProduit),
 description text,
-prixMinimum float,
-prixPlafond float,
-prixDeVente float,
+prixMinimumVente float,
 durreEnchere int,
-DateHeureEnchere TIMESTAMP default CURRENT_TIMESTAMP ,
+DateHeureEnchere TIMESTAMP default CURRENT_TIMESTAMP,
 status int default 0
 );
+
+---histo encherisseur --
+
+
+SELECT e.description, e.prixMinimumVente, e.durreEnchere, e.DateHeureEnchere, ho.montant_offre, ho.DateHeureMise, p.nomProduit, p.description, cp.typeCategorie FROM Utilisateur u JOIN HistoriqueOffre ho using(idUtilisateur) JOIN Enchere e using(idEnchere) JOIN Produit_Enchere pe  using(idEnchere) JOIN Produit p using(idProduit) JOIN CategorieProduit cp using(idCategorieProduit) WHERE u.idUtilisateur = 1 ORDER BY ho.DateHeureMise DESC;
+
+---histovendeur---
+
+SELECT e.description, e.prixMinimumVente, e.durreEnchere, e.DateHeureEnchere, p.nomProduit, p.description, cp.typeCategorie, re.prix_gagnant,u2.nom, u2.prenom, u2.email FROM Utilisateur u JOIN Enchere e using(idUtilisateur) JOIN Produit_Enchere pe using(idEnchere) JOIN Produit p using(idProduit) JOIN CategorieProduit cp using(idCategorieProduit) LEFT JOIN ResultatEnchere re using(idEnchere) LEFT JOIN Utilisateur u2 ON u2.idUtilisateur = re.idUtilisateur WHERE u.idUtilisateur = 1 ORDER BY e.DateHeureEnchere DESC;
+
+
+
 
 create table Produit_Enchere(
 idEnchere int references Enchere(idEnchere),
@@ -112,27 +76,36 @@ idProduit int references Produit(idProduit)
 
 
 
-create table HistoriqueEnchere(
-idHistoriqueEnchere serial primary key,
+create table HistoriqueOffre(
+idHistoriqueOffre serial primary key,
 idEnchere int references Enchere(idEnchere),
 idUtilisateur int references Utilisateur(idUtilisateur),
 durreEnchere int,
-prixDeVente float,
-DateHeureMise TIMESTAMP default CURRENT_TIMESTAMP 
+montant_offre float,
+DateHeureMise TIMESTAMP default CURRENT_TIMESTAMP
 );
 
-create table Commission(
-pourcentage float 
-);
 
-insert into Commission(pourcentage) values (12.5);
-
-
-create table CommissionEnchere(
-idCommission serial primary key,
+create table ResultatEnchere(
+idResultatEnchere serial primary key,
 idEnchere int references Enchere(idEnchere),
-montantRecu float
+idUtilisateur int references Utilisateur(idUtilisateur),
+prix_gagnant float,
+DateHeureGagnat TIMESTAMP default CURRENT_TIMESTAMP
 );
+
+create table PourcentagePrelevee(
+pourcentage float
+);
+
+
+create table PrelevementEnchere(
+idPrelevement serial primary key,
+idEnchere int references Enchere(idEnchere),
+montant float,
+DatePrelevement DATE default CURRENT_DATE
+);
+
 
 
 create table tokenAdmin(
@@ -158,25 +131,110 @@ role varchar(10)
 --statistiques-----
 
 view 1 : nombre de membres par jour , mois , annee
+
+
+
+select count(idUtilisateur) as nombre , extract(year from DateInscription) as annee , extract(month from DateInscription) as mois , to_char(DateInscription,'Mon') from Utilisateur group by extract(year from DateInscription) , extract(month from DateInscription),to_char(DateInscription,'Mon');
+
+
+
 view 2 : nombre total enchere par jour , mois , annee
-view 3 : nombre de lots qui ont été vendus par jour , mois , annee
-view 4 : montant total des ventes réalisées  par jour , mois , annee
-
-view 5 : fitambaran view 1 , view 2 , view 3 , view 4 
 
 
-Annee | Mois | jour | nombre de membres |nombre total enchere | nombre de lots qui ont été vendus | montant total des ventes réalisées 
+select count(idEnchere) as nombre , extract(year from DateHeureEnchere) as annee , extract(month from DateHeureEnchere) as mois , to_char(DateHeureEnchere,'Mon') from enchere group by extract(year from DateHeureEnchere) , extract(month from DateHeureEnchere),to_char(DateHeureEnchere,'Mon');
+
+
+view 3 : nombre de catégorie  produits vendus par catégories
+
+create or replace view categorieProduitVendu as  
+WITH all_categories AS (SELECT idCategorieProduit FROM CategorieProduit)
+SELECT cp2.idCategorieProduit, cp2.typeCategorie , COUNT(re.idEnchere) as total_produit_vendu
+FROM all_categories cp
+LEFT JOIN Produit p 
+using(idCategorieProduit)
+LEFT JOIN Produit_Enchere pe 
+using(idProduit)
+LEFT JOIN Enchere e 
+using(idEnchere)
+LEFT JOIN ResultatEnchere re 
+ON re.idEnchere = e.idEnchere AND re.idEnchere = pe.idEnchere
+LEFT JOIN CategorieProduit cp2
+ON cp2.idCategorieProduit = cp.idCategorieProduit
+GROUP BY cp2.idCategorieProduit,cp2.typeCategorie order by COUNT(re.idEnchere) desc;
 
 
 
-------
+view 6 : nombre de vente  des produits par client
+
+
+create or replace view StatClient as
+WITH all_utilisateurs AS ( SELECT idUtilisateur FROM utilisateur)
+SELECT cp2.nom ,cp2.prenom , cp2.idUtilisateur , COUNT(e.idUtilisateur) as nombre_produit_vendu
+FROM all_utilisateurs cp
+LEFT JOIN Enchere e 
+using(idUtilisateur)
+LEFT JOIN utilisateur cp2
+ON cp2.idUtilisateur = cp.idUtilisateur
+GROUP BY cp2.idUtilisateur order by COUNT(e.idUtilisateur) desc;
+
+-----view-----
 
 
 
+create or replace view ProduitCategorie as
+select p.idProduit , p.nomProduit , p.description , p.prix , p.numero_serie , p.DateSortie , p.Etat , p.Provenance , p.photo , c.idCategorieProduit , c.typeCategorie  from Produit p inner join CategorieProduit c using(idCategorieProduit);
+
+
+create or replace view v_total_membre as
+select count(idUtilisateur) as nombre , extract(year from DateInscription) as annee , extract(month from DateInscription) as mois, extract(day from DateInscription) as jour from Utilisateur group by
+extract(year from DateInscription) , extract(month from DateInscription) , extract(day from DateInscription)
+
+
+INSERT INTO Utilisateur (nom, prenom, email, mdp) VALUES ('John', 'Doe', 'john.doe@example.com', 'password123');
+INSERT INTO Utilisateur (nom, prenom, email, mdp) VALUES ('Jane', 'Smith', 'jane@example.com', 'password456');
 
 
 
+--- chiffre d'affaire par annee , mois ----
+create or replace view chiffreAffaireMoisAnnee as
+WITH months(month, year) AS (SELECT generate_series(1, 12), extract(year from current_date))SELECT months.month, months.year, coalesce(SUM(pe.montant),0) as montant FROM months LEFT JOIN PrelevementEnchere pe ON extract(month from pe.DatePrelevement) = months.month AND extract(year from pe.DatePrelevement) = months.year GROUP BY months.month, months.year;
 
 
+--Chiffre d'affaire de l'application----
+select sum(montant) from PrelevementEnchere; 
 
+
+INSERT INTO HistoriqueOffre (idEnchere, idUtilisateur, montant_offre) VALUES (1, 1, 750);
+INSERT INTO HistoriqueOffre (idEnchere, idUtilisateur, montant_offre) VALUES (1, 2, 800);
+INSERT INTO HistoriqueOffre (idEnchere, idUtilisateur, montant_offre) VALUES (2, 2,600);
+INSERT INTO HistoriqueOffre (idEnchere, idUtilisateur, montant_offre) VALUES (2, 1,900);
+
+
+INSERT INTO Admin (email, mdp) VALUES ('admin@example.com', 'adminpassword');
+
+
+--enchérisseur--
+
+create or replace view HistoriqueEnchere as
+select u.idutilisateur , u.nom , u.prenom , e.description , e.prixminimumvente , e.durreenchere , e.dateheureenchere , ho.idenchere , ho.montant_offre , ho.dateheuremise  from Utilisateur u join HistoriqueOffre ho using(idUtilisateur) join ResultatEnchere re using(idEnchere) join  ;
+
+---vendeur--
+
+
+INSERT INTO Enchere (idUtilisateur, description, prixMinimumVente,durreEnchere) 
+VALUES (1, 'Enchere pour un iPhone', 700,30);
+INSERT INTO Enchere (idUtilisateur, description, prixMinimumVente,durreEnchere)  
+VALUES (2, 'Enchere pour une chemise',300,40);
+
+
+INSERT INTO ResultatEnchere (idEnchere, idUtilisateur, prix_gagnant) VALUES (1, 1, 800);
+INSERT INTO ResultatEnchere (idEnchere, idUtilisateur, prix_gagnant) VALUES (2, 2, 40);
+
+
+insert into RechargementCompte(idUtilisateur,montant) values (1,300) , (1,400) ;
+
+
+INSERT INTO Produit_Enchere (idEnchere, idProduit) VALUES (1, 1);
+INSERT INTO Produit_Enchere (idEnchere, idProduit) VALUES (2, 4);
+INSERT INTO Produit_Enchere (idEnchere, idProduit) VALUES (2, 5);
 

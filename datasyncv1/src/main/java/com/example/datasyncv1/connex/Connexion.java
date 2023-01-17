@@ -29,8 +29,15 @@ public class Connexion
     }
     public Connexion()
     {
-
+        try {
+            Class.forName("org.postgresql.Driver");
+            this.con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cloudfinal", "postgres", "hardi");
+        } catch (Exception e) {
+        } finally {
+        }
     }
+
+
     public Connexion(String req,String ide)
     {
         try
@@ -49,18 +56,19 @@ public class Connexion
         {
             e.printStackTrace();
         }
-
     }
     public ResultSet getResultset()
     {
         return this.res;
     }
-
     public void getCommit() throws Exception
     {
         this.stat.executeQuery("commit");
     }
-
+    public void getRollBack() throws Exception
+    {
+        this.stat.executeQuery("rollback");
+    }
     public Statement getStat()
     {
         return this.stat;
